@@ -276,7 +276,7 @@ public class WhatAServer extends Server {
     }
 
     private void sendChat(String ip, int port, String msg) {
-        db.executeStatement("SELECT UserID, Message, Time FROM `chat__Message` WHERE `GroupID`='"+msg+"'"); // Get complete chat history from given chatid
+        db.executeStatement("SELECT chat__User.Name, chat__Message.Message, chat__Message.Time FROM `chat__Message`,`chat__User` WHERE `GroupID`='"+msg+"' AND `UserID`=`ID`"); // Get complete chat history from given chatid
         if (db.getErrorMessage() != null) {System.err.println(db.getErrorMessage()); return;}
         System.out.println(db.getCurrentQueryResult().getRowCount());
         if (db.getCurrentQueryResult().getRowCount() > 0) {
@@ -285,9 +285,7 @@ public class WhatAServer extends Server {
             if (db.getCurrentQueryResult().getRowCount() > 0) {
                 String chat = "GET CHAT::::";
                 for (int i = 0; i < groupData.getRowCount(); i++) { // Makes a parsable string for the client
-                    db.executeStatement("SELECT Name FROM `chat__User` WHERE `ID`='"+groupData.getData()[i][0]+"'"); // Get username from given user ids (TIME CONSUMING)
-                    if (db.getErrorMessage() != null) {System.err.println(db.getErrorMessage()); return;}
-                    chat += db.getCurrentQueryResult().getData()[0][0]+"::::"+groupData.getData()[i][1]+"::::"+groupData.getData()[i][2]+"::::";
+                    chat += groupData.getData()[0][0]+"::::"+groupData.getData()[i][1]+"::::"+groupData.getData()[i][2]+"::::";
                 }
                 System.out.println(chat);
                 send(ip, port, chat);
